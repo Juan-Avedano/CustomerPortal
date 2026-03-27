@@ -1,0 +1,45 @@
+{% extends "admin/base_admin.html" %}
+
+{% block admin_title %}Asignar Técnico a Visita #{{ visit.id }}{% endblock %}
+
+{% block admin_content %}
+<h2 class="h3 mb-4">Asignar Técnico a Visita #{{ visit.id }}</h2>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">Detalles de la Visita</div>
+            <div class="card-body">
+                <p><strong>Cliente:</strong> {{ visit.user.username }} ({{ visit.user.email }})</p>
+                <p><strong>Servicio:</strong> {{ visit.service.name }}</p>
+                <p><strong>Fecha Agendada:</strong> {{ visit.scheduled_datetime.strftime('%d/%m/%Y %H:%M') }}</p>
+                <p><strong>Motivo del Cliente:</strong></p>
+                <blockquote class="blockquote">
+                    <p class="mb-0">{{ visit.reason }}</p>
+                </blockquote>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">Formulario de Asignación</div>
+            <div class="card-body">
+                <form method="POST" novalidate>
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ form.technician.label(class="form-label") }}
+                        {{ form.technician(class="form-select") }}
+                        {% for error in form.technician.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <a href="{{ url_for('admin.manage_visits') }}" class="btn btn-secondary me-2">Cancelar</a>
+                        {{ form.submit(class="btn btn-primary") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

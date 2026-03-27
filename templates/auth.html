@@ -4,7 +4,8 @@
 
 {% block content %}
 <div class="auth-container">
-    <div id="login-form" class="form-wrapper active">
+    <div id="login-form" class="form-wrapper {% if form_register.errors or show_register %}inactive-left{% else %}active{% endif %}">
+        
         <div class="form-box">
             <h1 class="h3 mb-3 fw-bold text-white text-center">Iniciar Sesión</h1>
             <p class="text-white-50 text-center mb-4">Bienvenido de nuevo</p>
@@ -60,7 +61,7 @@
         </div>
     </div>
 
-    <div id="register-form" class="form-wrapper">
+    <div id="register-form" class="form-wrapper {% if form_register.errors or show_register %}active{% else %}inactive-right{% endif %}">
         <div class="form-box">
             <h1 class="h3 mb-3 fw-bold text-white text-center">Crear Cuenta</h1>
             <p class="text-white-50 text-center mb-4">Únete a nuestro portal</p>

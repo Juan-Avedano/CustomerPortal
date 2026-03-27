@@ -1,0 +1,63 @@
+{% extends 'customer_dashboard/base_dashboard.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-10 offset-md-1">
+            <h2>{{ title }}</h2>
+            <p class="text-muted">Su opinión es vital. Por favor, califique la atención del servicio técnico brindado para la siguiente visita.</p>
+        </div>
+    </div>
+    
+    
+
+    <div class="row mt-4">
+        <div class="col-md-10 offset-md-1">
+            <div class="card shadow-lg border-success">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Visita Técnica #{{ visita.id }}</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Motivo Reportado:</strong> {{ visita.reason }}</p>
+                    <p><strong>Servicio Afectado:</strong> {{ visita.service.name }}</p>
+                    <p><strong>Técnico Asignado:</strong> {{ visita.technician.name if visita.technician else 'Sin Asignar' }}</p>
+                    <hr>
+
+                    <form method="POST" action="{{ url_for('customer_dashboard.calificar_visita', visit_id=visita.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        {{ form.visita_id }} <h4 class="text-success mb-4">Formulario de Calificación</h4>
+
+                        <div class="form-group mb-3">
+                            <label class="form-control-label font-weight-bold">{{ form.puntuacion.label }} (0 = Muy Malo, 10 = Excelente)</label>
+                            {{ form.puntuacion(class="form-control form-control-lg") }}
+                            {% for error in form.puntuacion.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                        </div>
+
+                        <div class="form-group mt-4 mb-3">
+                            <label class="form-control-label font-weight-bold">{{ form.satisfaccion_valida.label }}</label>
+                            {{ form.satisfaccion_valida(class="form-control") }}
+                            {% for error in form.satisfaccion_valida.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                        </div>
+
+                        <div class="form-group mt-4 mb-3">
+                            {{ form.comentarios.label(class="form-label") }}
+                            {{ form.comentarios(class="form-control", rows="3") }}
+                            {% for error in form.comentarios.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{{ url_for('visits.list_visits') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Volver a Mis Visitas
+                            </a>
+                            
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-star"></i> {{ form.submit.label.text }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

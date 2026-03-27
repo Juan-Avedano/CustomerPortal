@@ -1,0 +1,66 @@
+{% extends "customer_dashboard/base_dashboard.html" %}
+
+{% block dashboard_title %}Modificar Visita Técnica{% endblock %}
+
+{% block dashboard_content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h1 class="h3 mb-0">Modificar Visita #{{ visit.id }}</h1>
+        </div>
+        <div class="card-body">
+            <!-- El 'action' del formulario ahora apunta a la ruta de modificación -->
+            <form method="POST" action="{{ url_for('visits.modify_visit', visit_id=visit.id) }}" novalidate>
+                {{ form.hidden_tag() }} <!-- Campo CSRF -->
+
+                <!-- Campo para seleccionar el Servicio -->
+                <div class="mb-3">
+                    {{ form.service.label(class="form-label") }}
+                    {{ form.service(class="form-select") }}
+                    {% for error in form.service.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <!-- Campo para describir el Motivo -->
+                <div class="mb-3">
+                    {{ form.reason.label(class="form-label") }}
+                    {{ form.reason(class="form-control", rows="4") }}
+                    {% for error in form.reason.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <!-- Campo para la Fecha y Hora con el calendario -->
+                <div class="mb-3">
+                    {{ form.scheduled_datetime.label(class="form-label") }}
+                    {{ form.scheduled_datetime(id="datetime-picker", class="form-control") }}
+                    {% for error in form.scheduled_datetime.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <!-- Botones de acción -->
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <a href="{{ url_for('visits.list_visits') }}" class="btn btn-secondary">Cancelar</a>
+                    {{ form.submit(class="btn btn-primary") }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+<script>
+    // Inicializamos el calendario interactivo, igual que en la página de agendar
+    flatpickr("#datetime-picker", {
+        locale: "es",
+        enableTime: true,
+        dateFormat: "Y-m-d H:i",
+        altInput: true,
+        altFormat: "F j, Y - h:i K",
+        minuteIncrement: 15,
+    });
+</script>
+{% endblock %}

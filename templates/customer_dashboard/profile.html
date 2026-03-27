@@ -4,9 +4,13 @@
 
 {% block dashboard_content %}
 
+
+
+
+
 <div class="card dashboard-card page-fade-in">
     <div class="card-header h5 d-flex justify-content-between align-items-center">
-    <span><i class="bi bi-person-vcard me-2"></i>Información de tu Perfil</span>
+    <span id="span2"><i id="span1" class="bi bi-person-vcard me-2"></i>Información de tu Perfil</span>
 
     <div>
         <a href="{{ url_for('customer_dashboard.change_password') }}" class="btn btn-outline-secondary btn-sm">
@@ -14,31 +18,27 @@
         </a>
 
         {# Este botón solo aparecerá si el usuario logueado es un administrador #}
-        {% if current_user.is_admin %}
-        <a href="#" class="btn btn-outline-primary btn-sm ms-2">
-            <i class="bi bi-pencil-square me-1"></i> Editar Perfil
-        </a>
-        {% endif %}
+       
     </div>
 </div>
     <div class="card-body">
         <div class="row">
             <div class="col-md-6 mb-3">
-                <p class="text-muted mb-1">Nombre de Usuario</p>
+                <p class="text-light mb-1">Nombre de Usuario</p>
                 <h6 class="fw-bold">{{ user.username }}</h6>
             </div>
             <div class="col-md-6 mb-3">
-                <p class="text-muted mb-1">Correo Electrónico</p>
+                <p class="text-light mb-1">Correo Electrónico</p>
                 <h6 class="fw-bold">{{ user.email }}</h6>
             </div>
             {% if user.registration_date %}
             <div class="col-md-6 mb-3">
-                <p class="text-muted mb-1">Fecha de Registro</p>
+                <p class="text-light mb-1">Fecha de Registro</p>
                 <h6 class="fw-bold">{{ user.registration_date.strftime('%d/%m/%Y') }}</h6>
             </div>
             {% endif %}
             <div class="col-md-6 mb-3">
-                <p class="text-muted mb-1">Estado de la Cuenta</p>
+                <p class="text-light mb-1">Estado de la Cuenta</p>
                 <h6>
                     {% if user.is_active %}
                         <span class="badge bg-success">Activa</span>
@@ -51,7 +51,7 @@
         
         <hr class="my-4">
 
-        <h5 class="mb-3">Servicios Contratados</h5>
+        <h5 class="text-light mb-3">Servicios Contratados</h5>
         {% if user_services %}
             <ul class="list-group list-group-flush">
                 {% for service in user_services %}
@@ -59,7 +59,7 @@
                     <div>
                         <strong>{{ service.name }}</strong>
                         <br>
-                        <small class="text-muted">{{ service.description }}</small>
+                        <small class="text-light">{{ service.description }}</small>
                     </div>
                     <span class="badge bg-primary rounded-pill">${{ "%.2f" | format(service.price) }}</span>
                 </li>
@@ -72,4 +72,19 @@
         {% endif %}
     </div>
 </div>
+
+<h5 class="card-title">Configuración de Seguridad</h5>
+<hr>
+
+{% if current_user.mfa_enable %}
+    
+    <button class="btn btn-sm btn-outline-danger" disabled>Desactivar 2FA</button>
+{% else %}
+    <div class="alert alert-warning">
+        <i class="fas fa-exclamation-triangle"></i> 2FA no activo. Recomendamos activarlo para mayor seguridad.
+    </div>
+    <a href="{{ url_for('customer_dashboard.mfa_setup') }}" class="btn btn-primary btn-sm">
+        <i class="fas fa-qrcode"></i> Activar 2FA Ahora
+    </a>
+{% endif %}
 {% endblock %}

@@ -14,11 +14,11 @@
         <div class="row border-bottom pb-3 mb-3">
             <div class="col-md-6 mb-3">
                 <p class="text-muted mb-1">Nombre de Usuario</p>
-                <h6 class="fw-bold">{{ user.username }}</h6>
+                <h6 class="fw-bold text-muted">{{ user.username }}</h6>
             </div>
             <div class="col-md-6 mb-3">
                 <p class="text-muted mb-1">Correo Electrónico</p>
-                <h6 class="fw-bold">{{ user.email }}</h6>
+                <h6 class="fw-bold text-muted">{{ user.email }}</h6>
             </div>
             <div class="col-md-6 mb-3">
                 <p class="text-muted mb-1">Estado</p>
@@ -42,7 +42,7 @@
             </div>
         </div>
 
-        <h5 class="mt-4 mb-3">Servicios Contratados</h5>
+        <h5 class="text-muted mt-4 mb-3">Servicios Contratados</h5>
         {% if user_services %}
             <ul class="list-group list-group-flush">
                 {% for service in user_services %}

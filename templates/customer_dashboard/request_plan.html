@@ -1,0 +1,78 @@
+{% extends 'customer_dashboard/base_dashboard.html' %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+    <div class="row">
+        <div class="col-md-10 offset-md-1">
+            <h2 id="t2">{{ title }}</h2>
+            <p class="text-muted">Utilice este formulario para solicitar la activación de planes adicionales (Ej: Packs de TV, aumento de velocidad). Un administrador revisará su petición.</p>
+        </div>
+    </div>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="row mt-4">
+        <div class="col-md-10 offset-md-1">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Detalles de su Solicitud</h5>
+                </div>
+                <div class="card-body">
+    <form method="POST" action="{{ url_for('customer_dashboard.solicitar_plan') }}">
+        {{ form.hidden_tag() }}
+
+        <div id="textoo1" class="form-group mb-4">
+            {{ form.tipo_peticion.label(class="form-label") }}
+            {{ form.tipo_peticion(class="form-control") }}
+            <small id="text1" class="form-text text-white-50">Elija la categoría general de su solicitud.</small>
+            {% for error in form.tipo_peticion.errors %}
+                <div class="invalid-feedback d-block">{{ error }}</div>
+            {% endfor %}
+        </div>
+        
+        <div id="textoo1" class="form-group mb-4">
+    {{ form.pack_solicitado.label(class="form-label") }}
+    {{ form.pack_solicitado(class="form-control", multiple=True, size="6") }} 
+    <small id="text1" class="form-text text-white-50">Mantenga presionada la tecla **Ctrl (Cmd en Mac)** para seleccionar múltiples opciones.</small>
+    {% for error in form.pack_solicitado.errors %}
+        <div class="invalid-feedback d-block">{{ error }}</div>
+    {% endfor %}
+</div>
+
+        <div id="textoo1" class="form-group mb-4">
+            {{ form.detalle_adicional.label(class="form-label") }}
+            {{ form.detalle_adicional(class="form-control", rows="3") }}
+            <small id="text1" class="form-text text-white-50">Escriba cualquier comentario o detalle adicional que el administrador deba saber.</small>
+            {% for error in form.detalle_adicional.errors %}
+                <div class="invalid-feedback d-block">{{ error }}</div>
+            {% endfor %}
+        </div>
+        
+        <div class="d-flex justify-content-between mt-4">
+            <div>
+                <a href="{{ url_for('customer_dashboard.ver_peticiones') }}" class="btn btn-secondary me-2">
+                    <i class="fas fa-arrow-left"></i> Ir al Historial
+                    <a href="{{ url_for('customer_dashboard.service_management') }}" class="btn btn-secondary fas fa-arrow-left">Volver a Mis Servicios</a>
+                </a>
+            </div>
+            
+            <div>
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-paper-plane"></i> {{ form.submit.label.text }}
+                </button>
+            </div>
+        </div>
+        
+    
+</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

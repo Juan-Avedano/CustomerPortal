@@ -1,0 +1,42 @@
+{% extends "base_auth.html" %} 
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-lg p-4">
+            <h4 class="card-title text-center mb-4">Verificación de Dos Factores</h4>
+            <p class="text-muted text-center small">
+                Ingrese el código de 6 dígitos generado por su aplicación de autenticación (ej. Google Authenticator o Authy).
+            </p>
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" action="{{ url_for('mfa_challenge') }}">
+                {{ form.hidden_tag() }}
+
+                <div class="form-group mb-4">
+                    {{ form.token.label(class="form-label") }}
+                    {{ form.token(class="form-control form-control-lg text-center", maxlength="6", autofocus=true) }}
+                    {% for error in form.token.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 mt-2">
+                    {{ form.submit.label.text }}
+                </button>
+            </form>
+            
+            <hr class="mt-4">
+            <div class="text-center small">
+                <a href="{{ url_for('logout') }}">¿Ingresó una cuenta incorrecta? Cerrar sesión.</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

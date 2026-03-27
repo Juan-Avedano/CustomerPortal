@@ -4,9 +4,15 @@
 
 {% block dashboard_content %}
 <div class="card dashboard-card">
-    <div class="card-header h5">
+    <div class="card-header h5 d-flex justify-content-between align-items-center">
         <i class="bi bi-box-seam me-2"></i>Catálogo de Servicios Disponibles
+        <a href="{{ url_for('customer_dashboard.index') }}" 
+       id="btn-volver-catalogo" 
+       class="btn btn-success fw-bold">
+       Volver a Mi Dashboard
+    </a>
     </div>
+    
     <div class="card-body">
         <p class="card-text text-muted">Explora nuestros servicios. Los que ya tienes contratados aparecen resaltados.</p>
 
@@ -36,8 +42,10 @@
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <button type="submit" class="btn btn-primary mt-auto w-100">Contratar</button>
                                 </form>
+                                
                             {% endif %}
                         </div>
+                        
                     </div>
                 </div>
             {% endfor %}

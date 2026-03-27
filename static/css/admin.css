@@ -3,15 +3,15 @@
 /* =================================== */
 
 :root {
-    --sidebar-bg: #1e293b;
-    --sidebar-text: #e2e8f0;
-    --sidebar-text-hover: #ffffff;
-    --sidebar-active-bg: #334155;
-    --main-bg: #f1f5f9;
-    --card-bg: #ffffff;
-    --border-color: #e2e8f0;
-    --primary-text: #0f172a;
-    --secondary-text: #64748b;
+    --sidebar-bg: #121212;
+    --sidebar-text: #495057;
+    --sidebar-text-hover: #000000;
+    --sidebar-active-bg: #e8f0fe;
+    --main-bg: #121212;
+    --card-bg: #2b2b2b;
+    --border-color: #333333;
+    --primary-text: #f0f0f0;
+    --secondary-text: #aaaaaa;
     --red-btn-bg: #dc2626;
     --red-btn-hover: #b91c1c;
     --blue-accent: #3b82f6;
@@ -29,30 +29,82 @@ html, body {
 .admin-layout-container {
     display: flex;
     height: 100vh;
+    background-color: var(--main-bg);
 }
-
+.list-group-flush {
+    margin-left: 5%;
+    /* Color oscuro consistente con el dashboard del cliente */
+    background-color: #121212 !important; /* Gris muy oscuro, casi negro */
+    color: #f8f9fa; /* Texto claro */
+}
 /* =================================== */
 /* ===== BARRA LATERAL (SIDEBAR) ===== */
 /* =================================== */
 
 .admin-sidebar {
     width: 260px;
-    background-color: var(--sidebar-bg);
+    background-color: var(--sidebar-bg) !important;
     color: var(--sidebar-text);
     display: flex;
     flex-direction: column;
     padding: 24px 0;
     flex-shrink: 0;
     transition: width 0.3s ease;
+    box-shadow: 1px 0 5px rgba(0, 0, 0, 0.1);
+}
+.list-group-item {
+    background-color: var(--sidebar-bg); /* Fondo del sidebar (#1c1c1c) */
+    color: var(--sidebar-text);
+    border: none; /* Eliminar bordes para que parezca un menú limpio */
+    padding: 16px 24px;
+    font-weight: 500;
+}
+.list-group-item-action {
+    /* Mantenemos el fondo del sidebar oscuro */
+    background-color: var(--sidebar-bg); 
+    color: var(--sidebar-text);
+    border: none; 
+    
+    /* 1. Más espacio vertical y horizontal */
+    padding: 12px 20px; /* Reducimos el padding de 16px 24px a algo más limpio */
+    
+    /* 2. Bordes redondeados sutiles (el toque moderno) */
+    border-radius: 6px !important; 
+    
+    /* 3. Margin entre elementos para que no se vean pegados */
+    margin-bottom: 8px; 
+    
+    transition: all 0.3s ease; /* Transición suave al pasar el mouse */
+}
+/* 🎯 ESTILO HOVER (El mismo gris del fondo activo, pero sin la clase 'active') */
+.list-group-item-action:hover {
+    background-color: var(--sidebar-active-bg); /* Fondo más claro (#333333) al pasar el mouse */
+    color: var(--sidebar-text-hover);
+    /* 4. Sombra suave para efecto "elevado" */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4); 
+    
+    /* 5. Pequeña transformación para feedback visual */
+    transform: translateY(-2px);
 }
 
+/* 🎯 ESTILO ACTIVO (El efecto de caja sólido) */
+.list-group-item-action.active {
+    background-color: var(--blue-accent) !important; /* Usar el azul brillante como fondo */
+    color: #ffffff !important; 
+    font-weight: 700;
+    
+    /* Aseguramos que el activo también tenga sombra */
+    box-shadow: 0 4px 10px rgba(33, 150, 243, 0.5); /* Sombra de color de acento */
+    transform: none; /* Elimina el efecto de translateY en el elemento activo */
+}
 .sidebar-header {
     padding: 0 24px;
     margin-bottom: 32px;
     text-align: center;
     font-size: 1.5rem;
     font-weight: 700;
-    color: #ffffff;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    color: #0268ce;
 }
 
 .sidebar-nav {
@@ -127,14 +179,15 @@ html, body {
     flex-grow: 1;
     padding: 32px;
     overflow-y: auto;
+    background-color: var(--main-bg);
 }
 
 .admin-section {
     background-color: var(--card-bg);
     padding: 24px;
     border-radius: 12px;
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-    margin-bottom: 32px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7); 
+   margin-bottom: 32px;
 }
 
 .admin-section h2 {
@@ -153,6 +206,7 @@ html, body {
 
 .table-responsive {
     overflow-x: auto;
+    
 }
 
 .admin-table {
@@ -260,6 +314,7 @@ html, body {
     }
 
     .admin-main-content {
+        background-color: var(--main-bg);
         padding: 16px;
     }
 
@@ -356,5 +411,35 @@ html, body {
 
     .actions-cell .btn-action {
         margin-right: 0;
+    }
+}
+
+@media (min-width: 768px) {
+    .admin-layout-container {
+        display: grid;
+        grid-template-columns: 260px 1fr; /* Mantiene el espacio del menú a la izquierda */
+    }
+
+    .admin-sidebar {
+        /* Forzamos a que el menú sea visible siempre en PC */
+        transform: none !important;
+        visibility: visible !important;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        display: flex !important;
+        flex-direction: column;
+        width: 260px !important;
+    }
+}
+
+/* --- CONFIGURACIÓN PARA MÓVILES --- */
+@media (max-width: 767.98px) {
+    .admin-main-content {
+        padding-top: 60px; /* Para que el botón no tape tus títulos */
+    }
+    
+    .admin-sidebar {
+        width: 280px; /* Ancho del menú cuando sale en el celu */
     }
 }

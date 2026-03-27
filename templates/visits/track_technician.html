@@ -1,0 +1,144 @@
+{% extends "customer_dashboard/base_dashboard.html" %}
+
+
+{% block dashboard_title %}Seguimiento de Visita #{{ visit.id }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="container mt-4">
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white">
+            <h1 class="h3 mb-0">Seguimiento de Técnico: {{ visit.technician.name if visit.technician else 'Aún no asignado' }}</h1>
+        </div>
+        <div class="card-body">
+            <p class="card-text text-muted">
+                Visita para el servicio: <strong>{{ visit.service.name }}</strong><br>
+                Motivo: {{ visit.reason }}
+            </p>
+            <hr>
+
+            <!-- Lógica para mostrar MAPA vs. FORMULARIO de Calificación -->
+
+            {% if visit.status != 'Completada' %}
+                <!-- === ESTADO: EN CURSO / EN CAMINO / AGENDADA (Mostrar Mapa) === -->
+                <div class="alert alert-info text-center">
+                    <strong>Estado Actual:</strong> {{ visit.status }}. El técnico se encuentra en movimiento.
+                </div>
+                <div id="map" style="height: 400px; width: 100%; border-radius: 5px;"></div>
+                <div class="text-center mt-3">
+                    <!-- Mantengo el botón de "Marcar como Completada" de tu código original, aunque debería ser solo para Admins/Técnicos -->
+                    <form action="{{ url_for('visits.complete_visit', visit_id=visit.id) }}" method="POST" onsubmit="return confirm('¿Confirma que el servicio técnico ha sido completado?');" class="d-inline">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="fas fa-check-circle me-2"></i> Marcar como Completada
+                        </button>
+                    </form>
+                </div>
+            
+            {% else %}
+                <!-- === ESTADO: COMPLETADA (Mostrar Formulario o Mensaje Final) === -->
+                
+                {% if visit.calificacion %} 
+                    <!-- Si ya fue calificada (usa el backref en TechnicalVisit) -->
+                    <div class="alert alert-success text-center">
+                        ✅ ¡Servicio Finalizado y Calificado! Gracias por su feedback.
+                        <br> Puntuación dada: <strong>{{ visit.calificacion.puntuacion }}/10</strong>
+                    </div>
+
+                {% else %}
+                    <!-- Si NO ha sido calificada (RD: Emitir mini-formulario) -->
+                    <div class="alert alert-warning text-center">
+                        ¡Servicio Completado! Por favor, ayúdenos a mejorar calificando la atención recibida.
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-10 offset-md-1">
+                            <!-- El action apunta a la ruta de POST en customer_dashboard/views.py -->
+                            <form method="POST" action="{{ url_for('customer_dashboard.calificar_visita', visit_id=visit.id) }}">
+    {{ form_calificacion.hidden_tag() }} 
+    
+    {{ form_calificacion.visita_id }} 
+
+    <h4 class="text-success mb-4">Califique el Servicio Técnico</h4>
+
+    <div class="form-group mb-3">
+        {{ form_calificacion.puntuacion.label(class="form-label font-weight-bold") }}
+        {{ form_calificacion.puntuacion(class="form-control form-control-lg") }}
+        {% for error in form_calificacion.puntuacion.errors %}
+            <div class="invalid-feedback d-block">{{ error }}</div>
+        {% endfor %}
+    </div>
+
+    <div class="form-group mt-3 mb-3">
+        {{ form_calificacion.satisfaccion_valida.label(class="form-label font-weight-bold") }}
+        {{ form_calificacion.satisfaccion_valida(class="form-control") }}
+        {% for error in form_calificacion.satisfaccion_valida.errors %}
+            <div class="invalid-feedback d-block">{{ error }}</div>
+        {% endfor %}
+    </div>
+
+    <div class="form-group mt-3 mb-3">
+        {{ form_calificacion.comentarios.label(class="form-label") }}
+        {{ form_calificacion.comentarios(class="form-control", rows="3") }}
+        {% for error in form_calificacion.comentarios.errors %}
+            <div class="invalid-feedback d-block">{{ error }}</div>
+        {% endfor %}
+    </div>
+
+    <button type="submit" class="btn btn-success btn-lg btn-block mt-4">
+        <i class="fas fa-star"></i> Enviar Calificación
+    </button>
+</form>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts_extra %}
+    {% if visit.status != 'Completada' and visit.technician %}
+    <script>
+        // 1. CONFIGURACIÓN INICIAL INMEDIATA
+        const technicianId = {{ visit.technician.id }};
+        const cordobaCentro = [-31.4167, -64.1833];
+        
+        // Creamos el mapa directamente en Córdoba
+        const map = L.map('map').setView(cordobaCentro, 14);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        // Creamos el marcador directamente en el centro (adiós a la Antártida)
+        const technicianMarker = L.marker(cordobaCentro).addTo(map);
+        technicianMarker.bindPopup("<b>Técnico: {{ visit.technician.name }}</b><br>En camino...").openPopup();
+
+        // 2. FUNCIÓN DE ACTUALIZACIÓN
+        function moverTecnico() {
+            fetch(`/visits/api/technician/${technicianId}/location`)
+                .then(response => {
+                    if (!response.ok) throw new Error("Error en red");
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.lat && data.lon) {
+                        const nuevaPos = [data.lat, data.lon];
+                        
+                        // Movemos el marcador con suavidad
+                        technicianMarker.setLatLng(nuevaPos);
+                        
+                        // Centramos el mapa gradualmente
+                        map.panTo(nuevaPos, { animate: true, duration: 1.5 });
+                    }
+                })
+                .catch(err => console.error("Fallo en seguimiento:", err));
+        }
+
+        // 3. ACTIVAR MOVIMIENTO
+        // Actualiza cada 4 segundos para un movimiento más fluido
+        setInterval(moverTecnico, 4000);
+    </script>
+    {% endif %}
+{% endblock %}

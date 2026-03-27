@@ -1,0 +1,101 @@
+{% extends 'admin/base_admin.html' %}
+{% block admin_content %}
+<div class="admin-section">
+    <h2>Reporte de Feedback Técnico</h2>
+    <p class="text-muted">Análisis de las calificaciones (0-10) y el feedback de los clientes sobre los servicios técnicos completados.</p>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-white bg-primary mb-3 shadow-sm">
+                <div class="card-header">Calificación Promedio</div>
+                <div class="card-body">
+                    <h4 class="card-title">{{ analisis.promedio }}/10</h4>
+                    <p class="card-text">Puntuación promedio de todas las visitas.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-success mb-3 shadow-sm">
+                <div class="card-header">Satisfacción Válida</div>
+                <div class="card-body">
+                    <h4 class="card-title">{{ analisis.resueltas }}%</h4>
+                    <p class="card-text">Porcentaje de clientes que reportaron que su necesidad fue resuelta.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-secondary mb-3 shadow-sm">
+                <div class="card-header">Visitas Calificadas</div>
+                <div class="card-body">
+                    <h4 class="card-title">{{ analisis.total }}</h4>
+                    <p class="card-text">Total de servicios que han recibido feedback.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Detalle de Calificaciones</h5>
+                </div>
+                <div class="card-body">
+                    {% if calificaciones %}
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered table-hover">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Puntuación</th>
+                                    <th>Satisfacción</th>
+                                    <th>Técnico</th>
+                                    <th>Cliente</th>
+                                    <th>Comentarios</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for calificacion, visita, user in calificaciones %}
+                                <tr>
+                                    <td>{{ calificacion.fecha_calificacion.strftime('%d/%m/%Y %H:%M') }}</td>
+                                    <td>
+                                        {% if calificacion.puntuacion >= 8 %}
+                                            <span class="badge rounded-pill text-bg-success">{{ calificacion.puntuacion }}</span>
+                                        {% elif calificacion.puntuacion >= 5 %}
+                                            <span class="badge rounded-pill text-bg-warning">{{ calificacion.puntuacion }}</span>
+                                        {% else %}
+                                            <span class="badge rounded-pill text-bg-danger">{{ calificacion.puntuacion }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if calificacion.satisfaccion_valida %}
+                                            <span class="badge rounded-pill text-bg-success">Sí, Resuelta</span>
+                                        {% else %}
+                                            <span class="badge rounded-pill text-bg-danger">No Resuelta</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ visita.technician.name if visita.technician else 'N/A' }}</td>
+                                    <td>{{ user.username }} (ID: {{ user.id }})</td>
+                                    <td>{{ calificacion.comentarios or 'Sin comentarios' }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                        <p class="alert alert-info mb-0">No se han registrado calificaciones de servicios técnicos aún.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

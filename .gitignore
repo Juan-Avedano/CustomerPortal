@@ -1,0 +1,15 @@
+# Python basura y entornos
+**/__pycache__/
+*.pyc
+venv/
+.venv/
+env/
+
+# Archivos de configuración y bases de datos locales
+.env
+instance/*.db
+instance/*.sqlite
+
+# Sistema
+.DS_Store
+Thumbs.db

@@ -1,0 +1,115 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block admin_content %}
+<div class="admin-section">
+    <h2>Gestión de Peticiones de Planes</h2>
+    <p class="text-muted">Revise, aplique y gestione las solicitudes de packs y servicios adicionales enviadas por los clientes.</p>
+    
+    
+
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-body d-flex justify-content-between align-items-center flex-wrap">
+                    <div class="btn-group mb-2 mb-md-0" role="group">
+                        <a href="{{ url_for('admin.listar_peticiones', estado='Pendiente') }}" class="btn {% if estado_filtro == 'Pendiente' %}btn-warning{% else %}btn-outline-warning{% endif %}">
+                            Pendientes ({{ contadores.Pendiente }})
+                        </a>
+                        <a href="{{ url_for('admin.listar_peticiones', estado='Aplicado') }}" class="btn {% if estado_filtro == 'Aplicado' %}btn-success{% else %}btn-outline-success{% endif %}">
+                            Aplicadas ({{ contadores.Aplicado }})
+                        </a>
+                        <a href="{{ url_for('admin.listar_peticiones', estado='Rechazado') }}" class="btn {% if estado_filtro == 'Rechazado' %}btn-info{% else %}btn-outline-info{% endif %}">
+                            Rechazadas ({{ contadores.Rechazado }})
+                        </a>
+                        <a href="{{ url_for('admin.listar_peticiones', estado='Eliminada') }}" class="btn {% if estado_filtro == 'Eliminada' %}btn-danger{% else %}btn-outline-danger{% endif %}">
+                            Eliminadas ({{ contadores.Eliminada }})
+                        </a>
+                        <a href="{{ url_for('admin.listar_peticiones', estado='Todas') }}" class="btn {% if estado_filtro == 'Todas' %}btn-secondary{% else %}btn-outline-secondary{% endif %}">
+                            Todas ({{ contadores.Total }})
+                        </a>
+                    </div>
+                    <h5 class="mt-2 mt-md-0">Mostrando: <span class="badge bg-primary">{{ estado_filtro }}</span></h5>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            {% if peticiones %}
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered table-hover">
+                    <thead class="bg-dark text-white">
+                        <tr>
+                            <th>ID</th>
+                            <th>Cliente</th>
+                            <th>Tipo / Detalle</th>
+                            <th>Fecha</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for peticion in peticiones %}
+                        <tr>
+                            <td>#{{ peticion.id }}</td>
+                            <td>
+                                <strong>{{ peticion.user.username }}</strong><br>
+                                <small>ID: {{ peticion.user_id }}</small>
+                            </td>
+                            <td>
+                                <strong>{{ peticion.tipo_peticion }}</strong><br>
+                                <small>{{ peticion.detalle_plan }}</small>
+                            </td>
+                            <td>{{ peticion.fecha_creacion.strftime('%d/%m/%Y %H:%M') }}</td>
+                            <td>
+                                {% if peticion.estado == 'Aplicado' %}
+                                    <span class="badge bg-success">{{ peticion.estado }}</span>
+                                {% elif peticion.estado == 'Pendiente' %}
+                                    <span class="badge bg-warning text-dark">{{ peticion.estado }}</span>
+                                {% elif peticion.estado == 'Rechazado' %}
+                                    <span class="badge bg-info">{{ peticion.estado }}</span>
+                                {% else %}
+                                    <span class="badge bg-danger">{{ peticion.estado }}</span>
+                                {% endif %}
+                                <br>
+                                {% if peticion.fecha_gestion %}
+                                    <small>({{ peticion.fecha_gestion.strftime('%d/%m/%Y') }})</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if peticion.estado in ['Pendiente', 'Rechazado'] %}
+                                <form method="POST" action="{{ url_for('admin.gestionar_peticion', peticion_id=peticion.id) }}" class="d-inline">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    
+                                    <button type="submit" name="accion" value="aplicar" class="btn btn-sm btn-success mb-1" 
+                                            title="Marcar como APLICADA y notificar al cliente"
+                                            onclick="return confirm('¿Confirma que el plan ha sido activado y desea marcar la petición como APLICADA?');">
+                                        Aplicar
+                                    </button>
+                                    <button type="submit" name="accion" value="rechazar" class="btn btn-sm btn-info mb-1"
+                                            title="Rechazar y archivar la petición">
+                                        Rechazar
+                                    </button>
+                                    <button type="submit" name="accion" value="eliminar" class="btn btn-sm btn-danger mb-1" 
+                                            title="Marcar como ELIMINADA la petición"
+                                            onclick="return confirm('¿Está seguro de marcar como ELIMINADA la petición?');">
+                                        Eliminar
+                                    </button>
+                                </form>
+                                {% else %}
+                                    <button class="btn btn-sm btn-secondary" disabled>Gestionada</button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+                <p class="alert alert-info">No hay peticiones con el estado **{{ estado_filtro }}**.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

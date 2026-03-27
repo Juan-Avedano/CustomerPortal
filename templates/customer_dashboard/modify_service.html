@@ -19,7 +19,7 @@
                     <div class="mb-3">
                         {{ form.plan.label(class="form-label fw-bold") }}
                         {{ form.plan(class="form-select") }}
-                        <div class="form-text mt-2">
+                        <div class="form-text mt-2 text-primary">
                             Tu plan actual es: <strong>{{ service.name }} (${{ "%.2f"|format(service.price) }})</strong>
                         </div>
                     </div>

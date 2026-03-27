@@ -5,6 +5,7 @@
 
 {% block content %}
 
+
 <div class="offcanvas offcanvas-start text-bg-dark" tabindex="-1" id="sidebarOffcanvas" aria-labelledby="sidebarOffcanvasLabel">
     <div class="offcanvas-header">
         <h5 class="offcanvas-title" id="sidebarOffcanvasLabel"><i class="bi bi-person-lines-fill me-2"></i>Panel del Cliente</h5>
@@ -44,9 +45,79 @@
 <button class="chatbot-fab">
     <i class="bi bi-chat-dots-fill"></i>
 </button>
+
+{% if current_user.is_authenticated %}
+
+    <div id="support-widget-container" class="chat-container">
+        <div class="chat-header">
+            <span><i id="hola" class="fas fa-headset me-2"></i> Soporte Rápido</span>
+            <button type="button" class="btn-close" aria-label="Cerrar" onclick="toggleChatWidget()"></button>
+        </div>
+        <div class="chat-body" style="padding: 20px;">
+            
+            <p id="title" class="text-center fw-bold">Opciones de Gestión:</p>
+            <div class="d-grid gap-2">
+                
+                <a href="{{ generate_whatsapp_link(motive='Necesito soporte técnico o ayuda con mi cuenta.') }}" 
+                class="btn btn-outline-success" 
+                target="_blank"> <i class="fab fa-whatsapp me-1"></i> Agente (WhatsApp)
+                </a>
+
+                <a href="{{ url_for('customer_dashboard.iniciar_pago_pendiente') }}" 
+                   class="btn btn-outline-primary" 
+                   onclick="toggleChatWidget(); return true;">
+                    <i class="fas fa-credit-card me-1"></i> Pagar Factura
+                </a>
+                
+            </div>
+            
+            <hr>
+            <p id="data-preloaded" class="small text-muted text-center">Datos precargados: ID {{ current_user.id }}.</p>
+        </div>
+    </div>
+
+    <button class="chatbot-fab" id="toggle-chat-btn">
+        <i class="bi bi-chat-dots-fill"></i>
+    </button>
+
+{% endif %}
+
+<script>
+    const container = document.getElementById('support-widget-container');
+    const button = document.getElementById('toggle-chat-btn');
+
+    function toggleChatWidget() {
+        const isVisible = container.style.display === 'block';
+        
+        // Muestra u oculta el menú
+        container.style.display = isVisible ? 'none' : 'block';
+        
+        // Cambia el ícono del botón flotante
+        button.innerHTML = isVisible 
+            ? '<i class="bi bi-chat-dots-fill"></i>'
+            : '<i class="fas fa-times"></i>'; // Muestra la 'X' de cerrar
+    }
+
+    // Funcionalidad de la Notificación (Requerimiento HU)
+    function showDerivationNotification(whatsappUrl) {
+        // Muestra el mensaje de confirmación
+        alert('✅ Solicitud de Agente procesada. Se abrirá WhatsApp para continuar.'); 
+        
+        // Cierra el menú desplegable al iniciar la derivación
+        toggleChatWidget();
+        
+        // Nota: La redirección a WhatsApp ocurre porque el <a> tiene target="_blank"
+    }
+
+    // CRÍTICO: Conectar el clic del botón a la función
+    if (button) {
+        button.addEventListener('click', toggleChatWidget);
+    }
+</script>
+
+
 {% endblock %}
 
-{% block scripts_extra %}{% endblock %}
 
 
 

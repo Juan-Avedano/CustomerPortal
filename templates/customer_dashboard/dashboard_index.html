@@ -4,9 +4,13 @@
 
 {% block dashboard_content %}
 
-    <div class="alert alert-primary border-0" role="alert">
+
+    <div class="alert alert-primary border-0" role="alert" id="principall">
       <h4 class="alert-heading">¡Hola, {{ current_user.username }}! 👋</h4>
-      <p class="mb-0">Bienvenido a tu portal de autogestión. Aquí tienes un resumen de tu cuenta.</p>
+      <div class="alert-bienvenida">
+      
+        <p>Bienvenido a tu portal de autogestión. Aquí tienes un resumen de tu cuenta.</p>
+      </div>
     </div>
 
     <h2 class="section-title mt-5"><i class="bi bi-bar-chart-fill me-2"></i>Resumen Rápido</h2>
@@ -17,7 +21,7 @@
                     <i class="bi bi-receipt-cutoff fs-2 text-primary me-3"></i>
                     <div>
                         <h6 class="card-subtitle text-muted mb-1">Última Factura</h6>
-                        <p class="h5 fw-bold mb-0">$55.000</p>
+                        <p class="h5 fw-bold mb-0">${{ "%.2f"|format(total_saldo) }}</p>
                     </div>
                 </div>
             </a>
@@ -45,12 +49,14 @@
             </a>
         </div>
         <div class="col-md-6 col-xl-3 mb-4">
-            <a href="#" class="card dashboard-card card-hover-danger h-100 text-decoration-none text-dark bg-danger-subtle border-0">
+            <!-- 1. El enlace ahora apunta a la página de notificaciones -->
+            <a id="notifications-card-link" href="{{ url_for('visits.notifications') }}" class="card dashboard-card card-hover-danger h-100 text-decoration-none text-dark bg-danger-subtle border-0">
                 <div class="card-body d-flex align-items-center">
                    <i class="bi bi-bell-fill fs-2 text-danger me-3"></i>
                     <div>
-                        <h6 class="card-subtitle text-muted mb-1">Notificaciones</h6>
-                        <p class="h5 fw-bold mb-0">2 Pendientes</p>
+                        <h6 class="card-subtitle text-muted mb-1">Notificaciones.</h6>
+                        <!-- 2. Le damos un ID a este párrafo para poder cambiarlo con JS -->
+                        <p id="notifications-count-text" class="h5 fw-bold mb-0">Cargando...</p>
                     </div>
                 </div>
             </a>
@@ -63,7 +69,7 @@
     <div class="card dashboard-card mb-4">
         <a href="{{ url_for('customer_dashboard.customer_contract_service') }}" class="list-group-item list-group-item-action p-3">
             <div class="d-flex w-100 justify-content-between">
-                <h5 class="mb-1"><i class="bi bi-cart-plus me-2"></i>Contratar Servicio</h5>
+                <h5 class="card-title"><i class="bi bi-cart-plus me-2"></i>Contratar Servicio</h5>
                 <i class="bi bi-plus-circle fs-4 text-primary"></i>
             </div>
             <p class="mb-1 text-muted">Explora y añade nuevos servicios a tu cuenta.</p>
@@ -91,12 +97,12 @@
             </a>
         </div>
         <div class="col-lg-4 mb-4">
-            <a href="#" class="card dashboard-card h-100 text-decoration-none text-dark">
-                <i class="bi bi-question-circle card-corner-icon"></i>
-                <div class="card-body">
-                    <h5 class="card-title"><i class="bi bi-life-preserver me-2"></i>Otras gestiones</h5>
-                    <p class="card-text text-muted">Consultas generales, solicitudes y asistencia.</p>
-                </div>
+            <a href="{{ url_for('visits.list_visits') }}" class="card dashboard-card h-100 text-decoration-none text-dark">
+            <i class="bi bi-tools card-corner-icon"></i>
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-calendar-check me-2"></i>Gestionar Visitas</h5>
+                <p class="card-text text-muted">Agenda, consulta y modifica tus visitas técnicas a domicilio.</p>
+            </div>
             </a>
         </div>
     </div>
@@ -122,69 +128,225 @@
             </a>
         </div>
     </div>
-    <h2 class="section-title mt-4"><i class="bi bi-reception-4 me-2"></i>Estado de Servicios</h2>
-<div class="card dashboard-card">
-    <div class="card-body">
-        <canvas id="servicesBarChart"></canvas>
+
+
+
+
+
+<h2 class="section-title mt-5"><i class="bi bi-graph-up-arrow me-2"></i> Dashboard Resumen de Actividad</h2>
+<div class="row">
+    
+    <div class="col-md-4 mb-4">
+        <div class="card dashboard-card h-100 mini-chart-bubble">
+            <div class="card-header text-center fw-bold small">Visitas Técnicas</div>
+            <div class="card-body">
+                <canvas id="userVisitsChart"></canvas> 
+                <p id="no-visits-message" class="alert alert-warning small mb-0" style="display:none;">
+                    Aún no tienes visitas técnicas.
+                </p>
+            </div>
+        </div>
     </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card dashboard-card h-100 mini-chart-bubble">
+            <div class="card-header text-center fw-bold small">Peticiones de Packs</div>
+            <div class="card-body">
+                <canvas id="userPeticionesChart"></canvas> 
+                <p id="no-peticiones-message" class="alert alert-info small mb-0" style="display:none;">
+                    No has realizado peticiones.
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card dashboard-card h-100 mini-chart-bubble">
+            <div class="card-header text-center fw-bold small">Tus Servicios vs. Precio</div>
+            <div class="card-body">
+                <canvas id="servicesBarChart"></canvas>
+            </div>
+        </div>
+    </div>
+
 </div>
-
+    
 {% block scripts_extra %}
+
 <script>
-async function createServicesBarChart() {
-    // 1. Pedimos los datos a nuestra nueva API
-    const response = await fetch("{{ url_for('customer_dashboard.service_status_chart_api') }}");
-    const chartData = await response.json();
 
-    // 2. Lógica para colorear las barras
-    // Si el servicio está contratado (valor 1), lo pintamos de azul. Si no (valor 0), de gris.
-    const backgroundColors = chartData.is_contracted.map(
-        isContracted => isContracted ? 'rgba(13, 110, 253, 0.8)' : 'rgba(200, 200, 200, 0.5)'
-    );
-    const borderColors = chartData.is_contracted.map(
-        isContracted => isContracted ? 'rgba(13, 110, 253, 1)' : 'rgba(200, 200, 200, 1)'
-    );
+    
 
-    // 3. Preparamos la configuración del gráfico
-    const ctx = document.getElementById('servicesBarChart').getContext('2d');
-    const config = {
-        type: 'bar', // Tipo de gráfico: barras
-        data: {
-            labels: chartData.labels,
-            datasets: [{
-                label: 'Precio del Servicio ($)',
-                data: chartData.prices,
-                backgroundColor: backgroundColors,
-                borderColor: borderColors,
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { display: false }, // Ocultamos la leyenda, los colores ya son informativos
-                title: { display: true, text: 'Servicios Disponibles vs. Contratados' }
+
+
+    // --- 1. DEFINICIONES DE FUNCIONES ASÍNCRONAS ---
+
+    // FUNCIÓN PARA EL GRÁFICO DE BARRAS (Servicios)
+    async function createServicesBarChart() {
+        // ... (Tu función createServicesBarChart COMPLETA va aquí) ...
+        const response = await fetch("{{ url_for('customer_dashboard.service_status_chart_api') }}");
+        const chartData = await response.json();
+        const backgroundColors = chartData.is_contracted.map(isContracted => isContracted ? 'rgba(13, 110, 253, 0.8)' : 'rgba(200, 200, 200, 0.5)');
+        const borderColors = chartData.is_contracted.map(isContracted => isContracted ? 'rgba(13, 110, 253, 1)' : 'rgba(200, 200, 200, 1)');
+        const ctx = document.getElementById('servicesBarChart').getContext('2d');
+        const config = {
+            type: 'bar',
+            data: {
+                labels: chartData.labels,
+                datasets: [{
+                    label: 'Precio del Servicio ($)',
+                    data: chartData.prices,
+                    backgroundColor: backgroundColors,
+                    borderColor: borderColors,
+                    borderWidth: 1
+                }]
             },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value, index, values) {
-                            return '$' + value.toLocaleString(); // Formato de moneda
-                        }
-                    }
-                }
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false }, title: { display: true, text: 'Servicios Disponibles vs. Contratados' } },
+                scales: { y: { beginAtZero: true, ticks: { callback: function(value) { return '$' + value.toLocaleString(); } } } }
+            },
+        };
+        new Chart(ctx, config);
+    }
+    
+    // FUNCIÓN PARA ACTUALIZAR NOTIFICACIONES
+    async function updateNotificationCount() {
+        // ... (Tu función updateNotificationCount COMPLETA va aquí) ...
+        const notificationText = document.getElementById('notifications-count-text');
+        try {
+            const response = await fetch("{{ url_for('visits.unread_notifications_api') }}");
+            const data = await response.json();
+            if (data.count > 0) {
+                notificationText.textContent = `${data.count} Pendiente${data.count > 1 ? 's' : ''}`;
+            } else {
+                notificationText.textContent = 'Ninguna pendiente';
             }
-        },
-    };
+        } catch (error) {
+            console.error("Error al cargar notificaciones:", error);
+            notificationText.textContent = 'Error al cargar';
+        }
+    }
 
-    // 4. Creamos el gráfico
-    new Chart(ctx, config);
-}
+    // --- 2. INICIALIZACIÓN PRINCIPAL (DOM CONTENT LOADED) ---
 
-document.addEventListener('DOMContentLoaded', createServicesBarChart);
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        // Configuración global de Chart.js
+        Chart.defaults.color = '#cccccc'; 
+        Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)'; 
+
+
+
+
+
+        
+        
+
+
+        const ctxPeticiones = document.getElementById('userPeticionesChart');
+    const noPeticionesMessage = document.getElementById('no-peticiones-message');
+
+    if (ctxPeticiones) {
+        fetch("{{ url_for('customer_dashboard.user_peticiones_summary_api') }}")
+            .then(response => response.json())
+            .then(data => {
+                if (data.data && data.data.length > 0) {
+                    new Chart(ctxPeticiones, {
+                        type: 'bar', // Tipo de barra
+                        data: {
+                            labels: data.labels,
+                            datasets: [{
+                                label: 'Cantidad de Peticiones',
+                                data: data.data,
+                                // 🎯 USAMOS LOS COLORES DINÁMICOS DEL BACKEND 🎯
+                                backgroundColor: data.background_colors,
+                                borderColor: data.border_colors,
+                                borderWidth: 1
+                            }]
+                        },
+                        options: { 
+                            indexAxis: 'y', // Hace que la barra sea horizontal
+                            responsive: true, 
+                            plugins: { 
+                                legend: { display: false },
+                                title: { 
+                                    display: true, 
+                                    text: 'Distribución de Peticiones por Estado',
+                                    font: { size: 16 } // Más grande para destacar
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    beginAtZero: true,
+                                    title: { display: true, text: 'Conteo' },
+                                    grid: { display: true } // Mantiene la cuadrícula para referencia
+                                },
+                                y: {
+                                    // Mejor contraste para las etiquetas del eje Y
+                                    ticks: { color: '#ffffff' } 
+                                }
+                            }
+                        }
+                    });
+                    ctxPeticiones.style.display = 'block';
+                } else {
+                    // Muestra el mensaje si no hay data
+                    if (noPeticionesMessage)
+                     noPeticionesMessage.style.display = 'block';
+                    ctxPeticiones.style.display = 'none';
+                }
+            })
+            .catch(error => console.error("Error al cargar resumen de peticiones:", error));
+    }
+
+        const ctxVisits = document.getElementById('userVisitsChart');
+    const noVisitsMessage = document.getElementById('no-visits-message');
+
+    if (ctxVisits) {
+        fetch("{{ url_for('customer_dashboard.user_visits_summary_api') }}")
+            .then(response => response.json())
+            .then(data => {
+                if (data.data && data.data.length > 0) {
+                    new Chart(ctxVisits, {
+                        type: 'doughnut',
+                        data: {
+                            labels: data.labels,
+                            datasets: [{
+                                label: 'Nº de Visitas',
+                                data: data.data,
+                                backgroundColor: data.background_colors,
+                                hoverOffset: 8
+                            }]
+                        },
+                        options: { 
+                            responsive: true, 
+                            plugins: { 
+                                legend: { position: 'right' },
+                                title: { display: true, text: 'Distribución de tus Visitas por Estado' }
+                            } 
+                        }
+                    });
+                    ctxVisits.style.display = 'block';
+                } else {
+                    // Muestra el mensaje si no hay data
+                    if (noVisitsMessage) noVisitsMessage.style.display = 'block';
+                    ctxVisits.style.display = 'none';
+                }
+            })
+            .catch(error => console.error("Error al cargar resumen de visitas:", error));
+    }
+
+
+        
+        
+        
+        // LLAMADAS FINALES
+        createServicesBarChart();
+        updateNotificationCount(); 
+        setInterval(updateNotificationCount, 30000);
+    });
 </script>
 
 {% endblock %}
-
 {% endblock %}

@@ -18,9 +18,9 @@
                         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
                             
                             <div class="mb-3 mb-md-0">
-                                <h6 class="fw-bold mb-1">{{ service.name }}</h6>
-                                <p class="small text-muted mb-2">{{ service.description }}</p>
-                                <div class="d-flex flex-wrap">
+                                <h6 class="fw-bold mb-1 list-title-dark">{{ service.name }}</h6>
+                                <p class="small mb-2 text-dark-contrast">{{ service.description }}</p>
+                                <div class="d-flex flex-wrap text-dark-contrast">
                                     <span class="me-4"><strong>Tipo:</strong> {{ service.type }}</span>
                                     <span class="me-4"><strong>Precio:</strong> ${{ "%.2f"|format(service.price) }}</span>
                                     <span><strong>Estado:</strong> <span class="badge bg-success">Activo</span></span>
@@ -28,15 +28,32 @@
                             </div>
 
                             <div class="text-md-end mt-2 mt-md-0">
-                                <a href="{{ url_for('customer_dashboard.modify_service', service_id=service.id) }}" class="btn btn-sm btn-outline-primary mb-1"><i class="bi bi-pencil-square me-1"></i>Modificar</a>
-                                
+                                {% if service.type =='Internet' %}
+                                <a href="{{ url_for('customer_dashboard.modificar_wifi', service_id=service.id) }}" 
+                                   class="btn btn-sm btn-info mb-1" title="Modificar SSID y Contraseña">
+                                    <i class="bi bi-wifi me-1"></i> Configurar WiFi
+                                </a>
+                                {% endif %}
+
+                                {% if service.type == 'TV' %}
+                                <a href="{{ url_for('customer_dashboard.solicitar_plan') }}" 
+                                   class="btn btn-sm btn-outline-success mb-1" title="Solicitar Packs de Fútbol o HBO">
+                                    <i class="bi bi-tv me-1"></i> Solicitar Packs
+                                </a>
+                                {% endif %}
+
+                                <a href="{{ url_for('customer_dashboard.modify_service', service_id=service.id) }}" 
+                                   class="btn btn-sm btn-outline-primary mb-1">
+                                    <i class="bi bi-pencil-square me-1"></i> Modificar Plan
+                                </a>
+
                                 <form action="{{ url_for('customer_dashboard.unsubscribe_service', service_id=service.id) }}" method="POST" class="d-inline">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                    
                                     <button type="submit" class="btn btn-sm btn-outline-danger mb-1" onclick="return confirm('¿Estás seguro de que quieres dar de baja este servicio?');">
-                                        <i class="bi bi-trash me-1"></i>Dar de Baja
+                                        <i class="bi bi-trash me-1"></i> Dar de Baja
                                     </button>
                                 </form>
+                                
                             </div>
 
                         </div>

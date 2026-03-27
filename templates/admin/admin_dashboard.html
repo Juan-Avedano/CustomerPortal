@@ -3,7 +3,8 @@
 {% block admin_title %}Resumen - Admin{% endblock %}
 
 {% block admin_content %}
-    <div class="row">
+
+ <div class="row">
         <div class="col-12">
             <div class="card dashboard-card">
                 <div class="card-header h5">
@@ -16,10 +17,10 @@
         </div>
     </div>
 
-    <div class="row mt-4">
-        <div class="col-lg-7 mb-4">
-            <div class="card dashboard-card h-100">
-                <div class="card-header h5">
+    <div class="row mt-4 g-4">
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header fw-bold">
                     <i class="bi bi-pie-chart-fill me-2"></i>Distribución de Servicios Contratados
                 </div>
                 <div class="card-body d-flex align-items-center justify-content-center">
@@ -29,9 +30,10 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-5 mb-4">
-            <div class="card dashboard-card h-100">
-                <div class="card-header h5">
+
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header fw-bold">
                     <i class="bi bi-people-fill me-2"></i>Estado de Usuarios
                 </div>
                 <div class="card-body d-flex align-items-center justify-content-center">
@@ -42,6 +44,53 @@
             </div>
         </div>
     </div>
+
+
+
+
+    <div class="row mt-4 g-4">
+    
+
+    <div class="col-lg-6">
+    <div class="card shadow-sm h-100">
+        <div class="card-header fw-bold">
+            📅 Distribución de Visitas Técnicas por Estado
+        </div>
+        <div class="card-body">
+            <canvas id="visitsStatusChart"></canvas>
+        </div>
+    </div>
+</div>
+    
+    <div class="col-lg-6 ">
+    <div class="card shadow-sm h-100">
+        <div class="card-header fw-bold">
+            ⚽ Gestión de Solicitudes de Packs Adicionales
+        </div>
+        <div class="card-body">
+            <canvas id="packRequestsChart"></canvas>
+        </div>
+    </div>
+</div>
+
+    <div class="col-lg-6">
+    <div class="card shadow-sm h-100">
+        <div class="card-header fw-bold">
+            📈 Tendencia de Calificación de Servicio (Últimas 10)
+        </div>
+        <div class="card-body">
+            <canvas id="feedbackTrendChart"></canvas>
+        </div>
+    </div>
+</div>
+</div>
+
+
+
+
+
+
+ 
 {% endblock %}
 
 {% block scripts_extra %}
@@ -50,7 +99,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     const ctxServicios = document.getElementById('serviciosChart');
     if (ctxServicios) {
-        fetch("{{ url_for('admin.reporte_servicios_contratados') }}")
+        fetch("{{ url_for('admin.service_stats_api') }}")
             .then(response => response.json())
             .then(data => {
                 new Chart(ctxServicios, {
@@ -92,6 +141,197 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             });
     }
+});
+const ctxPacks = document.getElementById('packRequestsChart');
+    if (ctxPacks) {
+        fetch("{{ url_for('admin.pack_requests_status_api') }}")
+            .then(response => response.json())
+            .then(data => {
+                new Chart(ctxPacks, {
+                    type: 'bar', // Gráfico de barras
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: 'Nº de Solicitudes',
+                            data: data.data,
+                            backgroundColor: data.background_colors, 
+                            borderWidth: 1
+                        }]
+                    },
+                    options: { 
+                        indexAxis: 'y', // Hace las barras horizontales
+                        responsive: true, 
+                        plugins: { 
+                            legend: { display: false },
+                            title: { display: true, text: 'Distribución por Estado' }
+                        },
+                        scales: { 
+                            x: { beginAtZero: true, ticks: { precision: 0 } },
+                            y: { grid: { display: false } } // Oculta las líneas horizontales
+                        }
+                    }
+                });
+            });
+    }
+
+const ctxVisitsStatus = document.getElementById('visitsStatusChart');
+    if (ctxVisitsStatus) {
+        // Petición al nuevo endpoint
+        fetch("{{ url_for('admin.visits_status_distribution_api') }}")
+            .then(response => response.json())
+            .then(data => {
+                new Chart(ctxVisitsStatus, {
+                    type: 'bar', // Gráfico de barras
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: 'Nº de Visitas',
+                            data: data.data,
+                            backgroundColor: data.background_colors, 
+                            borderWidth: 1
+                        }]
+                    },
+                    options: { 
+                        responsive: true, 
+                        plugins: { 
+                            legend: { display: false },
+                            title: { display: true, text: 'Conteo de Visitas por Estado' }
+                        },
+                        scales: { 
+                            y: { 
+                                beginAtZero: true, 
+                                ticks: { precision: 0 } // Asegura que los números sean enteros
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error("Error cargando el gráfico de estado de visitas:", error));
+    }
+    const ctxFeedbackTrend = document.getElementById('feedbackTrendChart');
+    if (ctxFeedbackTrend) {
+        // Petición al nuevo endpoint
+        fetch("{{ url_for('admin.feedback_trend_api') }}")
+            .then(response => response.json())
+            .then(data => {
+                new Chart(ctxFeedbackTrend, {
+                    type: 'line', // Gráfico de línea para tendencia
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: 'Puntuación Promedio',
+                            data: data.data,
+                            borderColor: 'rgba(255, 193, 7, 1)', // Amarillo/Naranja de Énfasis
+                            backgroundColor: 'rgba(255, 193, 7, 0.2)', 
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: { 
+                        responsive: true, 
+                        plugins: { legend: { display: false } },
+                        scales: { 
+                            y: { 
+                                min: 0, 
+                                max: 10, // Rango de puntuación 0-10
+                                title: { display: true, text: 'Puntuación (0-10)' } 
+                            },
+                            x: {
+                                title: { display: true, text: 'Fecha' }
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error("Error cargando el gráfico de tendencia de feedback:", error));
+    }
+
+
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script> 
+
+<script>
+// La función que ejecuta las llamadas a la API y dibuja los 4 gráficos
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // --- FUNCIÓN GENÉRICA PARA OBTENER DATOS Y DIBUJAR ---
+    function drawChart(elementId, config) {
+        if (document.getElementById(elementId)) {
+            new Chart(document.getElementById(elementId), config);
+        }
+    }
+
+    // --- GRÁFICO 1: Adopción del Portal (Líneas) ---
+    fetch("{{ url_for('admin.reporte_adopcion') }}")
+        .then(response => response.json())
+        .then(data => {
+            drawChart('chartAdopcion', {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [
+                        { label: 'Autogestionadas', data: data.autogestionadas, borderColor: 'rgb(75, 192, 192)', tension: 0.1, fill: false },
+                        { label: 'Asistidas', data: data.asistidas, borderColor: 'rgb(255, 99, 132)', tension: 0.1, fill: false }
+                    ]
+                },
+                options: { responsive: true, scales: { y: { beginAtZero: true } } }
+            });
+        });
+        
+    // --- GRÁFICO 2: Eficiencia de Soporte (Donut) ---
+    fetch("{{ url_for('admin.reporte_eficiencia_soporte') }}")
+        .then(response => response.json())
+        .then(data => {
+            drawChart('chartSoporte', {
+                type: 'doughnut',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        data: data.data,
+                        backgroundColor: ['#28a745', '#ffc107', '#dc3545'] // Éxito, Alerta, Peligro
+                    }]
+                },
+                options: { responsive: true, plugins: { legend: { position: 'right' } } }
+            });
+        });
+        
+    // --- GRÁFICO 3: Gestión de Pagos (Barras Apiladas) ---
+    fetch("{{ url_for('admin.reporte_gestion_pagos') }}")
+        .then(response => response.json())
+        .then(data => {
+            drawChart('chartPagos', {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: [
+                        { label: 'Recaudado (MP)', data: data.recaudado, backgroundColor: 'rgb(0, 123, 255)' },
+                        { label: 'Deuda Vencida', data: data.deuda_vencida, backgroundColor: 'rgb(220, 53, 69)' }
+                    ]
+                },
+                options: { responsive: true, scales: { x: { stacked: true }, y: { stacked: true } } }
+            });
+        });
+
+    // --- GRÁFICO 4: Calidad por Servicio (Barras Horizontales) ---
+    fetch("{{ url_for('admin.reporte_calidad_servicio') }}")
+        .then(response => response.json())
+        .then(data => {
+            drawChart('chartCalidad', {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'CSAT Promedio (0-10)',
+                        data: data.puntuacion,
+                        backgroundColor: 'rgba(40, 167, 69, 0.7)',
+                        borderColor: 'rgba(40, 167, 69, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: { indexAxis: 'y', responsive: true, scales: { x: { beginAtZero: true, max: 10 } } }
+            });
+        });
 });
 </script>
 {% endblock %}

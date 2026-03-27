@@ -62,20 +62,35 @@
     color: #aaa;
 }
 
+.navbar-brand {
+    display: flex; 
+    align-items: center; 
+    gap: 10px; /* Espacio entre la imagen y el texto */
+}
+
+/* 🎯 3. AJUSTE CRÍTICO: Aumentar el tamaño de la imagen */
+.navbar-brand img {
+    display: block; 
+    width: 40px; /* Tamaño más grande (de 30px a 40px) */
+    height: 40px;
+    /* Aseguramos que la imagen tenga un borde redondeado si lo deseas */
+    border-radius: 5px; 
+}
 
 /* =================================================================== */
 /* ===== ESTILOS PARA LAS PÁGINAS DEL PANEL DE CLIENTE (DASHBOARD) ==== */
 /* =================================================================== */
 
 .dashboard-bg {
-    background-color: #f8f9fa; /* Fondo gris claro */
+    background-color: #2c2c2c; /* Fondo gris claro */
+    color: #f0f0f0;
 }
 
 /* Solo aplicamos estos estilos dentro de .dashboard-bg */
 .dashboard-bg .section-title {
     font-size: 1.5rem;
     font-weight: 600;
-    color: #343a40;
+    color: #f0f0f0;
     padding-bottom: 0.5rem;
     margin-bottom: 1.5rem;
     border-bottom: 3px solid #0d6efd;
@@ -84,18 +99,71 @@
 
 .dashboard-bg .dashboard-card {
     position: relative;
-    border: 1px solid #e9ecef;
+    border: none;
     border-radius: 0.75rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
     transition: all 0.3s ease-in-out;
-    border-top: 4px solid transparent;
-    overflow: hidden;
-    background-color: #fdfdff; /* Fondo azulado muy claro */
+    border-top: none;
+    background-color: #383838; /* Fondo azulado muy claro */
+
+}
+/* 1. Estilo General del Contenedor de Checkout (Imitación de Interfaz de Pago) */
+.checkout-card {
+    background-color: #242424 !important; /* Fondo oscuro liso */
+    border: 1px solid #007bff; /* Borde sutil azul primario */
+    border-radius: 12px;
+    color: #ffffff; /* Asegurar texto blanco */
+    
 }
 
+/* 2. Colores de Énfasis (Mercado Pago / Azul) */
+.text-blue-intense {
+    color: #007bff !important; /* Azul brillante */
+}
+/* Aseguramos que el verde de éxito sea el verde de checkout */
+.btn-success {
+    background-color: #00A650 !important; /* Verde Mercado Pago */
+    border-color: #00A650 !important;
+    font-weight: bold;
+}
+
+.btn-success:hover {
+    background-color: #008740 !important;
+    border-color: #008740 !important;
+}
+
+/* 3. Estilo del Botón Rechazado (más sutil) */
+.btn-outline-danger {
+    color: #f7a6a6 !important; /* Rojo claro para contraste */
+    border-color: #6d0000 !important; /* Borde rojo oscuro */
+}
+
+.btn-outline-danger:hover {
+    color: #ffffff !important;
+    background-color: #b70000 !important;
+    border-color: #b70000 !important;
+}
+
+
+.card-header {
+    background-color: #2b2b2b !important;
+    color: #f0f0f0 !important;
+}
+.card-header #span1{
+    color: #0205b8;
+}
+.card-header #span2 {
+    color: #292cc9;
+}
+.card, .dashboard-card {
+    background-color: #212121 !important; /* Gris oscuro para las tarjetas */
+    border: 1px solid #333 !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+}
 .dashboard-bg .dashboard-card .card-title {
-    color: #0d6efd;
-    font-weight: 600;
+    color: #2196f3;
+    font-weight: 700;
+    font-size: 1.25rem;
 }
 
 .dashboard-bg .card-corner-icon {
@@ -111,12 +179,124 @@
 .dashboard-bg .card-body {
     position: relative;
     z-index: 1;
+    color: #cccccc;
+}
+.dashboard-bg h6, .dashboard-bg p {
+    color: #f0f0f0 !important; /* Aseguramos que el texto importante sea blanco */
 }
 
+#principall .alert-bienvenida p{
+    color: #0d6efd !important;
+    font-weight: bold;
+    font-size: 1,1rem;
+    border-color: #c9e7d8 !important;
+
+}
+
+#no-peticiones-message{
+    color: #000000 !important; /* Negro */
+    font-weight: bold !important; /* Negrita para mayor resalte */
+}
+#no-visits-message {
+    color: #000000 !important; /* Negro */
+    font-weight: bold !important; /* Negrita para mayor resalte */
+}
+
+#btn-volver-dashboard {
+    background-color: #198754 !important; /* Verde sólido */
+    border-color: #198754 !important;
+    padding: 8px 20px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    white-space: nowrap; /* Evita que el texto se rompa en dos líneas */
+}
+
+#btn-volver-dashboard:hover {
+    background-color: #157347 !important; /* Verde más oscuro al pasar el mouse */
+    border-color: #146c43 !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Ajuste opcional para móviles: el botón baja si no hay espacio */
+@media (max-width: 576px) {
+    .card-header.d-flex {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start !important;
+    }
+    #btn-volver-dashboard {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+.dashboard-bg .list-group-item {
+    background-color: #383838 !important; 
+    border: 1px solid #4a4a4a !important; 
+    /* El color base del texto heredado debe ser claro, pero no blanco puro */
+    color: #cccccc !important;
+}
+
+.report-summary-card {
+    /* Fondo ligeramente más claro que el dashboard (#2c2c2c) */
+    background-color: #383838 !important; 
+    border: none;
+    border-radius: 1rem; /* Bordes más redondeados para el look de "burbuja" */
+    
+    /* Sombra para el efecto flotante */
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7); 
+    
+    color: #f0f0f0;
+}
+
+.report-summary-card .card-header {
+    background-color: #313131 !important; /* Un poco más oscuro que el cuerpo */
+    border-bottom: 1px solid #4a4a4a !important;
+}
+
+/* 🎯 CLASE PERSONALIZADA PARA TEXTO SECUNDARIO LEGIBLE EN TEMA OSCURO */
+.text-dark-contrast {
+    /* Gris medio que contraste bien con el #212121 de la tarjeta */
+    color: #b0b0b0 !important; 
+}
+
+/* 🎯 CLASE PARA TÍTULOS DE LISTA (service.name) */
+.list-title-dark {
+    /* Azul suave o un blanco roto para el título principal */
+    color: #f0f0f0 !important; 
+}
 .dashboard-bg .dashboard-card:hover {
     transform: translateY(-8px);
     box-shadow: 0 8px 24px rgba(0,0,0,0.1);
 }
+
+
+
+.mini-chart-bubble {
+    /* Esquinas más redondeadas */
+    border-radius: 15px; 
+    /* Efecto "flotante" o "burbuja" con una sombra sutil */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* Sombra oscura para temas oscuros */
+    transition: transform 0.2s, box-shadow 0.2s;
+    /* Asegura que el contenido (el gráfico) no se desborde */
+    overflow: hidden; 
+}
+
+/* 2. Efecto Hover (Opcional, pero mejora el efecto burbuja) */
+.mini-chart-bubble:hover {
+    transform: translateY(-3px); /* Se eleva ligeramente */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.7); /* La sombra se hace más pronunciada */
+}
+
+/* 3. Asegurar que los gráficos se adapten bien en el espacio pequeño */
+.mini-chart-bubble .card-body {
+    padding: 1rem; /* Reduce el padding interno */
+    display: flex; /* Para centrar contenido si es necesario */
+    align-items: center;
+    justify-content: center;
+}
+
+
 
 .dashboard-bg .dashboard-card:hover .card-corner-icon {
     transform: rotate(-10deg) scale(1.1);
@@ -127,6 +307,61 @@
 .dashboard-bg .card-hover-warning:hover { border-top-color: #0d6efd; }
 .dashboard-bg .card-hover-danger:hover  { border-top-color: #0d6efd; }
 
+
+.chatbot-fab {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #007bff; /* Azul primario */
+    color: white;
+    font-size: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1050; /* Alto para estar por encima de todo */
+    border: none; /* Quitar borde del botón */
+}
+
+.card-body form .form-control {
+    background-color: #e0f7ff !important; /* Azul muy claro, casi blanco */
+    color: #000000;                     /* Asegura que el texto sea negro para contraste */
+    border-color: #2196f3;              /* Borde sutil azul medio */
+}
+.card-body form .form-control:focus {
+    background-color: #ffffff !important;
+    box-shadow: 0 0 0 0.25rem rgba(33, 150, 243, 0.25); /* Sombra azul más fuerte */
+}
+
+
+#t2 {
+    color: #2e7ac2;
+}
+#t1 h2{
+    color: #2e7ac2;
+}
+/* 2. Estilos del Contenedor del Menú (el cuadro que se despliega) */
+.chat-container {
+    position: fixed;
+    bottom: 100px; /* Se posiciona justo encima del botón */
+    right: 30px;
+    width: 320px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
+    z-index: 1049;
+    display: none; /* CRÍTICO: Inicialmente oculto por JS */
+    overflow: hidden;
+    color: #0205b8;
+}
+
+
+
+
 /* Botón Flotante del Chatbot */
 .chatbot-fab {
     position: fixed;
@@ -134,7 +369,7 @@
     right: 25px;
     width: 60px;
     height: 60px;
-    background-color: #0d6efd;
+    background-color: #0458d6;
     color: white;
     border-radius: 50%;
     border: none;
@@ -150,10 +385,114 @@
 .chatbot-fab:hover {
     transform: scale(1.1);
 }
+.navbar {
+    background-color: #1c1c1c !important; /* Usamos el color de --sidebar-bg */
+    /* El texto debe ser claro, lo cual ya está cubierto por navbar-dark */
+    border-top: none !important;
+    /* Usar un borde de separación sutil, pero oscuro, si quieres una línea */
+    border-bottom: 1px solid #343a40; 
+    
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5); /* Sombra sutil */
+    
+    padding-top: 0; 
+    padding-bottom: 0;
+}
 
+/* 🎯 Añadir una sombra sutil para el efecto de profundidad */
+.navbar-dark {
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5); /* Sombra sutil pero visible en tema oscuro */
+}
+
+/* 🎯 Opcional: Si quieres una línea de separación en la parte inferior del Header */
+.navbar-dark {
+    /* ... otros estilos ... */
+    border-bottom: 1px solid #333; 
+}
 /* Estilo para el Header y Footer */
 .navbar-custom-gradient {
-    background: #232526;
-    background: -webkit-linear-gradient(to right, #414345, #232526);
-    background: linear-gradient(to right, #414345, #232526);
+
+    background: #1c1c1c !important;
+    color: #f0f0f0 !important;
+    /* background: -webkit-linear-gradient(to right, #414345, #232526);
+    background: linear-gradient(to right, #414345, #232526); */
+}
+
+/* Posicionamiento y tamaño del botón flotante principal */
+.chat-widget-button {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #01264e; /* Azul de Bootstrap */
+    color: white;
+    font-size: 28px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1050; /* Alto para estar por encima de otros elementos */
+    transition: transform 0.3s ease;
+}
+
+.chat-widget-button:hover {
+    transform: scale(1.05);
+}
+
+/* Estilos para el contenedor del menú/chatbot */
+.chat-container {
+    position: fixed;
+    bottom: 100px; /* Se muestra justo encima del botón */
+    right: 30px;
+    width: 320px; /* Ancho similar al de la imagen */
+    max-height: 450px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
+    z-index: 1049;
+    display: none; /* Inicialmente oculto */
+    overflow: hidden;
+}
+
+.chat-header {
+    background-color: #0d6efd; /* Gris claro */
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+}
+
+
+#data-preloaded {
+    color: var(--bs-dark, #212529) !important; /* Forzamos el color oscuro, ignorando el 'text-muted' */
+    font-weight: bold; /* Hacer el texto más grueso */
+    border-top: 1px solid #ddd; /* Separación sutil */
+    padding-top: 5px;
+}
+
+.chat-body {
+    padding: 20px;
+    color: blueviolet;
+    
+}
+.chat-body #title{
+    background-color: #0d6efd;
+    color: rgb(24, 22, 21);
+    font-size: larger;
+    border-radius: 10px;
+}
+
+.contact-options {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 15px;
+}
+.contact-options a {
+    text-align: center;
+    text-decoration: none;
 }

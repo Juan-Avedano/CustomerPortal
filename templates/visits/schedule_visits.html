@@ -1,0 +1,59 @@
+{% extends "customer_dashboard/base_dashboard.html" %}
+
+{% block dashboard_content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h1 class="h3 mb-0">Agendar Nueva Visita Técnica</h1>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('visits.schedule_visit') }}" novalidate>
+                {{ form.hidden_tag() }}
+
+                <div class="mb-3">
+                    {{ form.service.label(class="form-label") }}
+                    {{ form.service(class="form-select") }}
+                    {% for error in form.service.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="mb-3">
+                    {{ form.reason.label(class="form-label") }}
+                    {{ form.reason(class="form-control", rows="4") }}
+                    {% for error in form.reason.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="mb-3">
+                    {{ form.scheduled_datetime.label(class="form-label") }}
+                    {{ form.scheduled_datetime(id="datetime-picker", class="form-control") }}
+                    {% for error in form.scheduled_datetime.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <a href="{{ url_for('visits.list_visits') }}" class="btn btn-secondary">Cancelar</a>
+                    {{ form.submit(class="btn btn-primary") }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+<script>
+    // Le decimos a flatpickr que se active en nuestro campo de fecha
+    flatpickr("#datetime-picker", {
+        locale: "es", // Usar el idioma español
+        enableTime: true, // Permitir seleccionar la hora
+        dateFormat: "Y-m-d H:i", // Formato que entiende nuestro backend (Python)
+        altInput: true, // Muestra un formato más amigable al usuario
+        altFormat: "F j, Y - h:i K", // Formato amigable (ej: Septiembre 10, 2025 - 02:30 PM)
+        minuteIncrement: 15, // Intervalos de tiempo de 15 minutos
+    });
+</script>
+{% endblock %}
